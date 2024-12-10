@@ -3,7 +3,12 @@ guid: 8af860c5028e33440a627fa4c460885d
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - forestSound: {fileID: 1692870403526980271, guid: 70f8f1cbb18e45141a15504e6a349a21, type: 3}
+  - windSound: {fileID: 2969995955133533613, guid: af391e83f8851854aae35eee289b3349, type: 3}
+  - horrorSound: {fileID: 6643933789413911331, guid: d0e0e5425a3af884d8bae42ceb107c75, type: 3}
+  - wolfSound: {fileID: 6954842578129485501, guid: cd646799c7b3cea4a8cae9f42e1626a5, type: 3}
+  - nightPrefab: {fileID: 8145307167649713450, guid: 01c77681dba14484586daede6a39ed91, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

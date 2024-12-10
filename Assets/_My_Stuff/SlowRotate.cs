@@ -7,23 +7,24 @@ public class SlowRotate:MonoBehaviour {
     public AudioSource horrorSound;
     public AudioSource wolfSound;
 
-    [Range(0f, 1f)] public float forestMasterVolume = 1f;
-    [Range(0f, 1f)] public float windMasterVolume = 1f;
-    [Range(0f, 1f)] public float horrorMasterVolume = 1f;
-    [Range(0f, 1f)] public float wolfMasterVolume = 1f;
+    [Range(0f, 1f)] public float forestMasterVolume = 0.5f;
+    [Range(0f, 1f)] public float windMasterVolume = 0.5f;
+    [Range(0f, 1f)] public float horrorMasterVolume = 0.5f;
+    [Range(0f, 1f)] public float wolfMasterVolume = 0.5f;
 
-    public float rotationDuration = 300f; // Zeit in Sekunden für eine vollständige 360-Grad-Drehung
+    public float rotationDuration = 60f; // Zeit in Sekunden für eine vollständige 360-Grad-Drehung
 
     private float rotationSpeed;
-    private float nextHorrorSoundTime;
-    private float nextWolfSoundTime;
+    private bool horrorPlayed;
+    private bool wolfPlayed;
+    private float currentRotation = 0f; // Initialer Rotationswert
 
     void Start() {
         // Initiale Rotation setzen
         if (startAtDay) {
-            transform.rotation = Quaternion.Euler(90f,0f,0f);
+            currentRotation = 0f; // Start bei Tag (0°)
         } else {
-            transform.rotation = Quaternion.Euler(-90f,0f,0f);
+            currentRotation = 180f; // Start bei Nacht (180°)
         }
 
         // Rotation in Grad pro Sekunde berechnen
@@ -33,72 +34,66 @@ public class SlowRotate:MonoBehaviour {
         forestSound.loop = true;
         windSound.loop = true;
 
-        // Forest Sound und Wind starten
+        // Falls "Play On Awake" deaktiviert ist, müssen wir die Sounds manuell starten
         forestSound.Play();
         windSound.Play();
-
-        // Horror und Wolf starten nicht auf Loop
-        ScheduleNextNightSounds();
     }
 
     void Update() {
-        // Rotation durchführen
-        transform.Rotate(rotationSpeed * Time.deltaTime,0f,0f);
+        // Berechne die Rotation anhand der Zeit und Geschwindigkeit
+        currentRotation += rotationSpeed * Time.deltaTime;
 
-        // Begrenzung auf 0–360 Grad und Anpassung der Wrap-Around-Logik
-        float currentRotation = transform.eulerAngles.x;
-        if (currentRotation > 180f) currentRotation -= 360f;
+        // Sicherstellen, dass der Rotation-Wert im Bereich von 0° bis 360° bleibt
+        currentRotation %= 360f;
+        print(currentRotation);
 
-        // Forest-Sound Lautstärke (Tag)
+        // Aktualisiere die Rotation des Objekts direkt, um das Objekt zu drehen
+        transform.rotation = Quaternion.Euler(currentRotation,0f,0f);
+
+        // Berechnung der Lautstärken für Forest-Sound
         if (currentRotation >= 0f && currentRotation <= 90f) {
-            // Lauter werden von 0° bis 90°
+            // Forest wird lauter von 0° bis 90°
             forestSound.volume = Mathf.Lerp(0f,forestMasterVolume,currentRotation / 90f);
         } else if (currentRotation > 90f && currentRotation <= 180f) {
-            // Leiser werden von 90° bis 180°
+            // Forest wird leiser von 90° bis 180°
             forestSound.volume = Mathf.Lerp(forestMasterVolume,0f,(currentRotation - 90f) / 90f);
         } else {
-            // Nacht (180° bis -90°)
+            // Nacht: Forest ist aus
             forestSound.volume = 0f;
         }
 
-        // Wind-Sound Lautstärke (Nacht)
-        if (currentRotation >= -90f && currentRotation <= 0f) {
-            // Lauter werden von -90° bis 0°
-            windSound.volume = Mathf.Lerp(0f,windMasterVolume,(currentRotation + 90f) / 90f);
-        } else if (currentRotation > 0f && currentRotation <= 90f) {
-            // Leiser werden von 0° bis 90°
-            windSound.volume = Mathf.Lerp(windMasterVolume,0f,currentRotation / 90f);
+        // Berechnung der Lautstärken für Wind-Sound
+        if (currentRotation >= 180f && currentRotation <= 270f) {
+            // Wind wird lauter von 180° bis 270°
+            windSound.volume = Mathf.Lerp(0f,windMasterVolume,(currentRotation - 180f) / 90f);
+        } else if (currentRotation > 270f && currentRotation <= 360f) {
+            // Wind wird leiser von 270° bis 360°
+            windSound.volume = Mathf.Lerp(windMasterVolume,0f,(currentRotation - 270f) / 90f);
         } else {
-            // Tag (90° bis 180°)
+            // Tag: Wind ist aus
             windSound.volume = 0f;
         }
 
-        // Horror- und Wolfs-Sounds nur nachts abspielen (-90° bis 0°)
-        if (currentRotation >= -90f && currentRotation <= 0f) {
-            if (Time.time >= nextHorrorSoundTime) {
-                horrorSound.volume = horrorMasterVolume;
-                horrorSound.PlayOneShot(horrorSound.clip);
-                ScheduleNextHorrorSound();
-            }
-
-            if (Time.time >= nextWolfSoundTime) {
-                wolfSound.volume = wolfMasterVolume;
-                wolfSound.PlayOneShot(wolfSound.clip);
-                ScheduleNextWolfSound();
-            }
+        // Horror- und Wolfs-Sounds nur nach einem gewissen Zeitpunkt abspielen (200° und 320°)
+        if (currentRotation >= 220f && !horrorPlayed) // Horror bei 200° (nach 200° Tag/Nacht)
+        {
+            horrorSound.volume = horrorMasterVolume;
+            horrorSound.PlayOneShot(horrorSound.clip);
+            horrorPlayed = true; // Horror-Sound nur einmal
         }
-    }
 
-    private void ScheduleNextNightSounds() {
-        ScheduleNextHorrorSound();
-        ScheduleNextWolfSound();
-    }
+        if (currentRotation >= 300f && !wolfPlayed) // Wolf bei 320° (nach 320° Tag/Nacht)
+        {
+            wolfSound.volume = wolfMasterVolume;
+            wolfSound.PlayOneShot(wolfSound.clip);
+            wolfPlayed = true; // Wolf-Sound nur einmal
+        }
 
-    private void ScheduleNextHorrorSound() {
-        nextHorrorSoundTime = Time.time + Random.Range(10f,60f); // Horror 1x pro Minute
-    }
-
-    private void ScheduleNextWolfSound() {
-        nextWolfSoundTime = Time.time + Random.Range(30f,120f); // Wolf 2x pro Nacht
+        // Reset der Flags, wenn die Rotation zum Tag zurückkehrt (0° bis 180°)
+        if (currentRotation >= 0f && currentRotation <= 180f) {
+            // Tagsüber: Horror und Wolf können zurückgesetzt werden, um bei Bedarf erneut zu spielen
+            horrorPlayed = false;
+            wolfPlayed = false;
+        }
     }
 }

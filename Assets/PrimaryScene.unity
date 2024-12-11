@@ -796,15 +796,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400040, guid: 0962bdca27eaca34aaa15f7fdf608faf, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.483
+      value: -1.26
       objectReference: {fileID: 0}
     - target: {fileID: 400040, guid: 0962bdca27eaca34aaa15f7fdf608faf, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.859
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 400040, guid: 0962bdca27eaca34aaa15f7fdf608faf, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.453
+      value: -2.54
       objectReference: {fileID: 0}
     - target: {fileID: 400040, guid: 0962bdca27eaca34aaa15f7fdf608faf, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4691,7 +4691,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8af860c5028e33440a627fa4c460885d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startAtDay: 1
+  startAtDay: 0
   forestSound: {fileID: 2076357908}
   windSound: {fileID: 1143423085}
   horrorSound: {fileID: 1144488923}
@@ -4701,7 +4701,6 @@ MonoBehaviour:
   horrorMasterVolume: 0.5
   wolfMasterVolume: 0.5
   rotationDuration: 60
-  wolfSoundRadius: 10
 --- !u!1 &708044148 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: fb71756ccbba0e44ab3819fbb6b85d7c, type: 3}
@@ -5497,7 +5496,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4467138112451190354, guid: 688f659a428e23b438092fdf93e8c708, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.656
+      value: 2.05
       objectReference: {fileID: 0}
     - target: {fileID: 4467138112451190354, guid: 688f659a428e23b438092fdf93e8c708, type: 3}
       propertyPath: m_LocalPosition.y
@@ -5505,7 +5504,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4467138112451190354, guid: 688f659a428e23b438092fdf93e8c708, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.548
+      value: 2.27
       objectReference: {fileID: 0}
     - target: {fileID: 4467138112451190354, guid: 688f659a428e23b438092fdf93e8c708, type: 3}
       propertyPath: m_LocalRotation.w

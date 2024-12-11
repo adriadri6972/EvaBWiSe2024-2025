@@ -13,7 +13,6 @@ public class SlowRotate:MonoBehaviour {
     [Range(0f, 1f)] public float wolfMasterVolume = 0.5f;
 
     public float rotationDuration = 60f; // Zeit in Sekunden für eine vollständige 360-Grad-Drehung
-    public float wolfSoundRadius = 10f; // Radius für die zufällige Platzierung des Wolfsounds
 
     private float rotationSpeed;
     private bool horrorPlayed;
@@ -46,6 +45,7 @@ public class SlowRotate:MonoBehaviour {
 
         // Sicherstellen, dass der Rotation-Wert im Bereich von 0° bis 360° bleibt
         currentRotation %= 360f;
+        print(currentRotation);
 
         // Aktualisiere die Rotation des Objekts direkt, um das Objekt zu drehen
         transform.rotation = Quaternion.Euler(currentRotation,0f,0f);
@@ -75,16 +75,17 @@ public class SlowRotate:MonoBehaviour {
         }
 
         // Horror- und Wolfs-Sounds nur nach einem gewissen Zeitpunkt abspielen (200° und 320°)
-        if (currentRotation >= 220f && !horrorPlayed) // Horror bei 220° (nach 200° Tag/Nacht)
+        if (currentRotation >= 220f && !horrorPlayed) // Horror bei 200° (nach 200° Tag/Nacht)
         {
             horrorSound.volume = horrorMasterVolume;
             horrorSound.PlayOneShot(horrorSound.clip);
             horrorPlayed = true; // Horror-Sound nur einmal
         }
 
-        if (currentRotation >= 300f && !wolfPlayed) // Wolf bei 300° (nach 320° Tag/Nacht)
+        if (currentRotation >= 300f && !wolfPlayed) // Wolf bei 320° (nach 320° Tag/Nacht)
         {
-            PlayWolfSoundFromRandomDirection();
+            wolfSound.volume = wolfMasterVolume;
+            wolfSound.PlayOneShot(wolfSound.clip);
             wolfPlayed = true; // Wolf-Sound nur einmal
         }
 
@@ -94,22 +95,5 @@ public class SlowRotate:MonoBehaviour {
             horrorPlayed = false;
             wolfPlayed = false;
         }
-    }
-
-    void PlayWolfSoundFromRandomDirection() {
-        // Generiere eine zufällige Richtung um das Objekt
-        Vector3 randomDirection = Random.onUnitSphere;
-        randomDirection.y = Mathf.Abs(randomDirection.y); // Verhindere, dass der Sound unterhalb des Bodens ist
-        randomDirection *= wolfSoundRadius;
-
-        // Setze die Position der AudioSource auf die zufällige Richtung
-        wolfSound.transform.position = transform.position + randomDirection;
-
-        // Stelle sicher, dass der Wolfssound 3D ist
-        wolfSound.spatialBlend = 1f;
-
-        // Spiele den Wolfssound ab
-        wolfSound.volume = wolfMasterVolume;
-        wolfSound.PlayOneShot(wolfSound.clip);
     }
 }

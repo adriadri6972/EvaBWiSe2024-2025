@@ -4836,7 +4836,7 @@ MonoBehaviour:
   wolfMasterVolume: 0.5
   rotationDuration: 60
   fogStartDensity: 0
-  fogMaxDensity: 0
+  fogMaxDensity: 0.1
 --- !u!1 &708044148 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: fb71756ccbba0e44ab3819fbb6b85d7c, type: 3}

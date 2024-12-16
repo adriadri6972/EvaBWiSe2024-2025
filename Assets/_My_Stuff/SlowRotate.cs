@@ -14,6 +14,10 @@ public class SlowRotate:MonoBehaviour {
 
     public float rotationDuration = 60f; // Zeit in Sekunden für eine vollständige 360-Grad-Drehung
 
+    [Header("Fog Settings")]
+    public float fogStartDensity = 0.0f; // Anfangsdichte des Nebels
+    public float fogMaxDensity = 0.05f; // Maximale Dichte des Nebels
+
     private float rotationSpeed;
     private bool horrorPlayed;
     private bool wolfPlayed;
@@ -37,6 +41,12 @@ public class SlowRotate:MonoBehaviour {
         // Falls "Play On Awake" deaktiviert ist, müssen wir die Sounds manuell starten
         forestSound.Play();
         windSound.Play();
+
+        // Nebel initialisieren
+        RenderSettings.fog = false;
+        RenderSettings.fogMode = FogMode.Exponential;
+        RenderSettings.fogDensity = fogStartDensity;
+        RenderSettings.fogColor = Color.black; // Setze die Nebelfarbe auf Schwarz
     }
 
     void Update() {
@@ -50,50 +60,65 @@ public class SlowRotate:MonoBehaviour {
         // Aktualisiere die Rotation des Objekts direkt, um das Objekt zu drehen
         transform.rotation = Quaternion.Euler(currentRotation,0f,0f);
 
-        // Berechnung der Lautstärken für Forest-Sound
-        if (currentRotation >= 0f && currentRotation <= 90f) {
-            // Forest wird lauter von 0° bis 90°
-            forestSound.volume = Mathf.Lerp(0f,forestMasterVolume,currentRotation / 90f);
-        } else if (currentRotation > 90f && currentRotation <= 180f) {
-            // Forest wird leiser von 90° bis 180°
-            forestSound.volume = Mathf.Lerp(forestMasterVolume,0f,(currentRotation - 90f) / 90f);
-        } else {
-            // Nacht: Forest ist aus
-            forestSound.volume = 0f;
-        }
+        // Lautstärke und Nebel anpassen
+        UpdateForestSound();
+        UpdateWindSound();
+        UpdateFog();
 
-        // Berechnung der Lautstärken für Wind-Sound
-        if (currentRotation >= 180f && currentRotation <= 270f) {
-            // Wind wird lauter von 180° bis 270°
-            windSound.volume = Mathf.Lerp(0f,windMasterVolume,(currentRotation - 180f) / 90f);
-        } else if (currentRotation > 270f && currentRotation <= 360f) {
-            // Wind wird leiser von 270° bis 360°
-            windSound.volume = Mathf.Lerp(windMasterVolume,0f,(currentRotation - 270f) / 90f);
-        } else {
-            // Tag: Wind ist aus
-            windSound.volume = 0f;
-        }
-
-        // Horror- und Wolfs-Sounds nur nach einem gewissen Zeitpunkt abspielen (200° und 320°)
-        if (currentRotation >= 220f && !horrorPlayed) // Horror bei 200° (nach 200° Tag/Nacht)
-        {
+        // Horror- und Wolfs-Sounds
+        if (currentRotation >= 220f && !horrorPlayed) {
             horrorSound.volume = horrorMasterVolume;
             horrorSound.PlayOneShot(horrorSound.clip);
-            horrorPlayed = true; // Horror-Sound nur einmal
+            horrorPlayed = true;
         }
 
-        if (currentRotation >= 300f && !wolfPlayed) // Wolf bei 320° (nach 320° Tag/Nacht)
-        {
+        if (currentRotation >= 300f && !wolfPlayed) {
             wolfSound.volume = wolfMasterVolume;
             wolfSound.PlayOneShot(wolfSound.clip);
-            wolfPlayed = true; // Wolf-Sound nur einmal
+            wolfPlayed = true;
         }
 
-        // Reset der Flags, wenn die Rotation zum Tag zurückkehrt (0° bis 180°)
+        // Reset der Flags
         if (currentRotation >= 0f && currentRotation <= 180f) {
-            // Tagsüber: Horror und Wolf können zurückgesetzt werden, um bei Bedarf erneut zu spielen
             horrorPlayed = false;
             wolfPlayed = false;
+        }
+    }
+
+    void UpdateForestSound() {
+        if (currentRotation >= 0f && currentRotation <= 90f) {
+            forestSound.volume = Mathf.Lerp(0f,forestMasterVolume,currentRotation / 90f);
+        } else if (currentRotation > 90f && currentRotation <= 180f) {
+            forestSound.volume = Mathf.Lerp(forestMasterVolume,0f,(currentRotation - 90f) / 90f);
+        } else {
+            forestSound.volume = 0f;
+        }
+    }
+
+    void UpdateWindSound() {
+        if (currentRotation >= 180f && currentRotation <= 270f) {
+            windSound.volume = Mathf.Lerp(0f,windMasterVolume,(currentRotation - 180f) / 90f);
+        } else if (currentRotation > 270f && currentRotation <= 360f) {
+            windSound.volume = Mathf.Lerp(windMasterVolume,0f,(currentRotation - 270f) / 90f);
+        } else {
+            windSound.volume = 0f;
+        }
+    }
+
+    void UpdateFog() {
+        if (currentRotation >= 180f && currentRotation <= 270f) {
+            // Nebel wird dichter von 180° bis 270°
+            float fogDensity = Mathf.Lerp(fogStartDensity, fogMaxDensity, (currentRotation - 180f) / 90f);
+            RenderSettings.fogDensity = fogDensity;
+            RenderSettings.fog = true; // Nebel aktivieren
+        } else if (currentRotation > 270f && currentRotation <= 360f) {
+            // Nebel wird dünner von 270° bis 360°
+            float fogDensity = Mathf.Lerp(fogMaxDensity, fogStartDensity, (currentRotation - 270f) / 90f);
+            RenderSettings.fogDensity = fogDensity;
+            RenderSettings.fog = true; // Nebel aktiv halten
+        } else {
+            // Tag: Nebel aus
+            RenderSettings.fog = false;
         }
     }
 }

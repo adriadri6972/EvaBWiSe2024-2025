@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class SlowRotate:MonoBehaviour {
-    public bool startAtDay = true; // Legt fest, wo die Rotation beginnt
+    public static bool startAtDay = true; // Legt fest, wo die Rotation beginnt
     public AudioSource forestSound;
     public AudioSource windSound;
     public AudioSource horrorSound;
@@ -50,6 +50,16 @@ public class SlowRotate:MonoBehaviour {
     }
 
     void Update() {
+        // Wenn Escape gedrückt wird, das Programm beenden
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            Application.Quit();
+            // Für den Editor-Modus, wenn das Programm über den Editor gestartet wird
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#endif
+            return;
+        }
+
         // Berechne die Rotation anhand der Zeit und Geschwindigkeit
         currentRotation += rotationSpeed * Time.deltaTime;
 
